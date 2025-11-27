@@ -1,0 +1,30 @@
+{
+  "name": "healthchain-access-control",
+  "version": "1.0.0",
+  "description": "A privacy-preserving blockchain dApp for managing patient consent and secure access to off-chain medical data. Includes smart contracts for identity, consent management, and data sharing, with full auditability of all access attempts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sachaloeb/healthchain-access-control.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/sachaloeb/healthchain-access-control/issues"
+  },
+  "homepage": "https://github.com/sachaloeb/healthchain-access-control#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.5",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.1",
+    "@types/node": "^22.19.1",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "hardhat": "^3.0.15",
+    "typescript": "~5.8.0",
+    "viem": "^2.40.3"
+  }
+}
