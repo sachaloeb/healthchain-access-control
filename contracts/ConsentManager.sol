@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
+/// @notice Minimal interface to talk to RewardToken
+interface IRewardToken {
+    function rewardForConsent(address user, uint256 amount) external;
+}
+
 /// @title ConsentManager
 /// @notice Handles patient-to-requester consents for accessing specific data
-
 contract ConsentManager {
     enum ConsentStatus {
         None,
@@ -20,6 +24,15 @@ contract ConsentManager {
         ConsentStatus status; 
         string purpose; // Optional description, mostly for UI
     }
+
+    // --- reward token wiring ---
+
+    /// @notice owner can configure reward token address
+    address public owner;
+    IRewardToken public rewardToken;
+
+    /// @notice how many tokens a patient gets per granted consent
+    uint256 public constant REWARD_PER_CONSENT = 10 * 1e18;
 
     // Incremented with each new consent
     uint256 public nextConsentId;
@@ -50,9 +63,26 @@ contract ConsentManager {
         uint64 timestamp
     );
 
+    event RewardTokenAddressSet(address indexed token);
+
     modifier onlySubject(uint256 consentId) {
         require(consents[consentId].subject == msg.sender, "Not consent subject");
         _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    /// @notice set the reward token contract used to mint rewards
+    function setRewardToken(address _rewardToken) external onlyOwner {
+        rewardToken = IRewardToken(_rewardToken);
+        emit RewardTokenAddressSet(_rewardToken);
     }
 
     function grantConsent(
@@ -87,6 +117,11 @@ contract ConsentManager {
             expiresAt,
             purpose
         );
+
+        // --- reward logic: if rewardToken is configured, mint tokens for the patient ---
+        if (address(rewardToken) != address(0)) {
+            rewardToken.rewardForConsent(msg.sender, REWARD_PER_CONSENT);
+        }
     }
 
     function revokeConsent(uint256 consentId) external onlySubject(consentId) {
