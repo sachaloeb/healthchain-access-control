@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 import "../contracts/RewardToken.sol";
 
 contract RewardTokenTest is Test {
@@ -112,5 +112,35 @@ contract RewardTokenTest is Test {
         vm.prank(alice);
         vm.expectRevert(bytes("Allowance too low"));
         reward.transferFrom(bob, outsider, 2e18);
+    }
+    function testGas_deploy_RewardToken() public {
+        uint256 gasBefore = gasleft();
+        vm.prank(admin);
+        RewardToken token = new RewardToken();
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS deploy RewardToken:", gasUsed);
+        assert(address(token) != address(0));
+    }
+
+    function testGas_rewardForConsent() public {
+        uint256 gasBefore = gasleft();
+        vm.prank(consentMod);
+        reward.rewardForConsent(bob, 1e18);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS RewardToken.rewardForConsent:", gasUsed);
+    }
+
+    function testGas_transfer() public {
+        vm.prank(consentMod);
+        reward.rewardForConsent(bob, 10e18);
+
+        uint256 gasBefore = gasleft();
+        vm.prank(bob);
+        reward.transfer(alice, 1e18);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS RewardToken.transfer:", gasUsed);
     }
 }

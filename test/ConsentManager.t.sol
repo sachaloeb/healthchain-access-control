@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 import "../contracts/ConsentManager.sol";
 
 contract CM_PatientConsentFlows is Test {
@@ -101,5 +101,48 @@ contract CM_PatientConsentFlows is Test {
 
         // System doesn't remove the old one, just adds another
         assertTrue(second > first, "Second consent should be a new ID");
+    }
+
+    function testGas_deploy_ConsentManager() public {
+        uint256 gasBefore = gasleft();
+        ConsentManager cm = new ConsentManager();
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS deploy ConsentManager:", gasUsed);
+        assert(address(cm) != address(0));
+    }
+
+    function testGas_grantConsent() public {
+        uint64 expiresAt = uint64(block.timestamp + 7 days);
+
+        uint256 gasBefore = gasleft();
+        vm.prank(bobThePatient);
+        consentSystem.grantConsent(
+            drAlice,
+            patientXrayId,
+            expiresAt,
+            "treatment"
+        );
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS ConsentManager.grantConsent:", gasUsed);
+    }
+
+    function testGas_revokeConsent() public {
+        uint64 expiresAt = uint64(block.timestamp + 7 days);
+        vm.prank(bobThePatient);
+        uint256 cid = consentSystem.grantConsent(
+            drAlice,
+            labResultId,
+            expiresAt,
+            "lab review"
+        );
+
+        uint256 gasBefore = gasleft();
+        vm.prank(bobThePatient);
+        consentSystem.revokeConsent(cid);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS ConsentManager.revokeConsent:", gasUsed);
     }
 }

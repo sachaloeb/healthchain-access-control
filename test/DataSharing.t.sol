@@ -158,4 +158,57 @@ contract DataSharingTest is Test {
 
         assertEq(returnedUri, uri, "returned URI must match stored URI");
     }
+
+    function testGas_deploy_DataSharing() public {
+        uint256 gasBefore = gasleft();
+        DataSharing ds = new DataSharing(address(mockConsent));
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS deploy DataSharing:", gasUsed);
+        // prevent optimizations from removing ds
+        assert(address(ds) != address(0));
+    }
+
+    function testGas_registerDataRecord() public {
+        uint256 dataTypeId = 1;
+        bytes32 recordHash = keccak256(abi.encodePacked("gas-record"));
+        string memory uri = "ipfs://gas-record";
+
+        uint256 gasBefore = gasleft();
+        vm.prank(patient);
+        dataSharing.registerDataRecord(patient, dataTypeId, recordHash, uri);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS DataSharing.registerDataRecord:", gasUsed);
+    }
+
+    function testGas_accessData_withConsent() public {
+        // store one record
+        (uint256 dataTypeId,, string memory uri) = _registerOneRecord();
+
+        // mock consent as "allowed"
+        mockConsent.setAllow(true);
+
+        uint256 gasBefore = gasleft();
+        vm.prank(requester);
+        string memory returnedUri = dataSharing.accessData(patient, dataTypeId);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS DataSharing.accessData (with consent):", gasUsed);
+        assertEq(returnedUri, uri);
+    }
+
+    function testGas_accessData_withoutConsent() public {
+        (uint256 dataTypeId,,) = _registerOneRecord();
+
+        mockConsent.setAllow(false);
+
+        uint256 gasBefore = gasleft();
+        vm.prank(requester);
+        vm.expectRevert(bytes("No valid consent"));
+        dataSharing.accessData(patient, dataTypeId);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        console2.log("GAS DataSharing.accessData (no consent, revert):", gasUsed);
+    }
 }
