@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @notice Minimal interface to interact with your ConsentManager contract
+
 interface IConsentManager {
     function hasValidConsent(
         address patient,
@@ -11,33 +11,24 @@ interface IConsentManager {
     ) external view returns (bool);
 }
 
-/**
- * @title DataSharing
- * @notice Stores hashes + URIs for off-chain medical data and enforces access via ConsentManager.
- *
- * Design goals (from project spec):
- *  - Only hashes and references on-chain, never raw medical data.
- *  - Access is allowed only if ConsentManager reports valid consent.
- *  - Every access attempt (granted or denied) is logged as an event.
- */
+
 contract DataSharing {
-    /// @notice Single off-chain data record for a patient & data type
     struct DataRecord {
-        bytes32 recordHash;   // Hash of the off-chain record
-        string storageURI;    // Pointer (e.g., IPFS CID, HTTPS URL, etc.)
-        uint256 createdAt;    // Timestamp when record was registered
+        bytes32 recordHash;
+        string storageURI;
+        uint256 createdAt;
     }
 
-    /// @notice Consent manager used to verify access permissions
+
     IConsentManager public consentManager;
 
-    /// @notice Simple owner pattern so you can update config if needed
+
     address public owner;
 
-    /// @dev patient => dataTypeId => list of records
+
     mapping(address => mapping(uint256 => DataRecord[])) private records;
 
-    /// @notice Emitted whenever a patient registers a new data record
+
     event DataRecordRegistered(
         address indexed patient,
         uint256 indexed dataTypeId,
@@ -46,7 +37,7 @@ contract DataSharing {
         uint256 timestamp
     );
 
-    /// @notice Emitted when access is granted
+
     event AccessGranted(
         address indexed patient,
         address indexed requester,
@@ -55,7 +46,7 @@ contract DataSharing {
         uint256 timestamp
     );
 
-    /// @notice Emitted when access is denied
+
     event AccessDenied(
         address indexed patient,
         address indexed requester,
@@ -75,10 +66,8 @@ contract DataSharing {
         owner = msg.sender;
     }
 
-    /**
-     * @notice Register a new off-chain data record.
-     * @dev Patient-centric model: only the patient can register their own records.
-     */
+
+
     function registerDataRecord(
         address patient,
         uint256 dataTypeId,
@@ -107,9 +96,7 @@ contract DataSharing {
         );
     }
 
-    /**
-     * @notice View helper to get the latest record for a patient & data type.
-     */
+
     function getLatestRecord(
         address patient,
         uint256 dataTypeId
@@ -119,9 +106,7 @@ contract DataSharing {
         return list[list.length - 1];
     }
 
-    /**
-     * @notice Returns how many records exist for a patient & data type.
-     */
+
     function getRecordCount(
         address patient,
         uint256 dataTypeId
@@ -129,13 +114,7 @@ contract DataSharing {
         return records[patient][dataTypeId].length;
     }
 
-    /**
-     * @notice Request access to patient's latest record for a given data type.
-     * @dev
-     *  - Checks ConsentManager.hasValidConsent(patient, msg.sender, dataTypeId, now).
-     *  - Emits AccessGranted or AccessDenied for the audit log.
-     *  - Returns the storage URI on success (off-chain system uses it to fetch data).
-     */
+
     function accessData(
         address patient,
         uint256 dataTypeId
@@ -171,10 +150,7 @@ contract DataSharing {
         return latest.storageURI;
     }
 
-    /**
-     * @notice Optional helper: update the ConsentManager address.
-     *         Handy during development if you redeploy ConsentManager.
-     */
+
     function setConsentManager(address _consentManager) external onlyOwner {
         require(_consentManager != address(0), "Invalid consent manager");
         consentManager = IConsentManager(_consentManager);

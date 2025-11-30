@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {Test, console2} from "forge-std/Test.sol";
 import "../contracts/DataSharing.sol";
 
-/// @dev Very simple mock of ConsentManager so we can toggle "hasValidConsent"
+
 contract MockConsentManager is IConsentManager {
     bool public allow;
 
@@ -29,7 +29,6 @@ contract DataSharingTest is Test {
     address patient = address(0x1);
     address requester = address(0x2);
 
-    // Local copy of events so we can use expectEmit
     event DataRecordRegistered(
         address indexed patient,
         uint256 indexed dataTypeId,
@@ -71,16 +70,13 @@ contract DataSharingTest is Test {
         dataSharing.registerDataRecord(patient, dataTypeId, recordHash, uri);
     }
 
-    /// -----------------------------------------------------------------------
-    /// registerDataRecord tests
-    /// -----------------------------------------------------------------------
 
     function test_registerDataRecord_StoresRecordAndEmitsEvent() public {
         uint256 dataTypeId = 1;
         bytes32 recordHash = keccak256(abi.encodePacked("record-1"));
         string memory uri = "ipfs://example-hash";
 
-        // Expect the event from DataSharing
+
         vm.expectEmit(true, true, true, true, address(dataSharing));
         emit DataRecordRegistered(
             patient,
@@ -93,7 +89,7 @@ contract DataSharingTest is Test {
         vm.prank(patient);
         dataSharing.registerDataRecord(patient, dataTypeId, recordHash, uri);
 
-        // Check latest record matches what we stored
+
         DataSharing.DataRecord memory rec =
             dataSharing.getLatestRecord(patient, dataTypeId);
 
@@ -120,20 +116,15 @@ contract DataSharingTest is Test {
         dataSharing.getLatestRecord(patient, 1);
     }
 
-    /// -----------------------------------------------------------------------
-    /// accessData tests (consent + audit logging)
-    /// -----------------------------------------------------------------------
 
     function test_accessData_RevertsAndLogsDenied_WhenNoConsent() public {
-        // First, store a record so data exists
         (uint256 dataTypeId,,) = _registerOneRecord();
 
-        // Mock says "no consent"
         mockConsent.setAllow(false);
 
         vm.prank(requester);
 
-        // Expect AccessDenied event
+
         vm.expectEmit(true, true, true, true, address(dataSharing));
         emit AccessDenied(
             patient,
@@ -143,7 +134,6 @@ contract DataSharingTest is Test {
             block.timestamp
         );
 
-        // And expect the call itself to revert
         vm.expectRevert(bytes("No valid consent"));
         dataSharing.accessData(patient, dataTypeId);
     }
@@ -151,12 +141,10 @@ contract DataSharingTest is Test {
     function test_accessData_ReturnsURIAndLogsGranted_WhenConsent() public {
         (uint256 dataTypeId,, string memory uri) = _registerOneRecord();
 
-        // Mock says "consent is valid"
         mockConsent.setAllow(true);
 
         vm.prank(requester);
 
-        // Expect AccessGranted event
         vm.expectEmit(true, true, true, true, address(dataSharing));
         emit AccessGranted(
             patient,
