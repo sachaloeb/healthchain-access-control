@@ -146,4 +146,34 @@ contract SystemWorkflowTest is Test {
         console2.log("Expiry test consentId:", consentId);
 
     }
+
+    /// @notice Test scenario where requester attempts access without patient consent.
+    ///         register identity → register data → access denied (no consent granted)
+    function test_accessDenied_noConsent() public {
+        uint256 dataTypeId = 3;
+        bytes32 recordHash = keccak256(abi.encodePacked("no-consent-record"));
+        string memory uri = "ipfs://no-consent-record";
+
+        // 1. Patient registers data record
+        vm.prank(patient);
+        dataSharing.registerDataRecord(patient, dataTypeId, recordHash, uri);
+
+        // 2. Verify no consent exists
+        (bool hasConsent, ) = consent.isConsentValid(
+            patient,
+            requester,
+            bytes32(dataTypeId)
+        );
+        assertFalse(hasConsent, "No consent should exist");
+
+        // 3. Requester attempts to access data without consent - should revert
+        vm.prank(requester);
+        vm.expectRevert(bytes("No valid consent"));
+        dataSharing.accessData(patient, dataTypeId);
+
+        // 4. Verify patient has no reward tokens (no consent was granted)
+        uint256 rewardBalance = reward.balanceOf(patient);
+        assertEq(rewardBalance, 0, "Patient should not receive rewards without granting consent");
+    }
+
 }
