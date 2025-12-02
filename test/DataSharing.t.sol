@@ -120,10 +120,10 @@ contract DataSharingTest is Test {
     function test_accessData_RevertsAndLogsDenied_WhenNoConsent() public {
         (uint256 dataTypeId,,) = _registerOneRecord();
 
+        // mock consent as "denied"
         mockConsent.setAllow(false);
 
         vm.prank(requester);
-
 
         vm.expectEmit(true, true, true, true, address(dataSharing));
         emit AccessDenied(
