@@ -27,13 +27,6 @@ The platform is built as part of the *Decentralized Digital Identity and Data Sh
   - ESM-based Hardhat config
   - Viem & Ignition toolchain pre-configured by Hardhat template
 
-Planned/in progress:
-
-- `IdentityRegistry` for hashed identities
-- `ConsentManager` for consent creation, revocation, and validation
-- Token / incentive mechanism for controlled data sharing
-- Optional front-end (Viem.js) for interaction with the local Hardhat node
-
 ---
 
 ## Tech Stack
@@ -43,7 +36,7 @@ Planned/in progress:
   - Hardhat v3
 - **Testing**
   - Hardhat Solidity tests using `forge-std/Test.sol`
-  - Node’s `node:test` for JavaScript/TypeScript tests (from template)
+  - Python scripts (`scripts/*.py`) for local interaction with contracts.
 - **Tooling**
   - `@nomicfoundation/hardhat-toolbox-viem`
   - TypeScript
@@ -55,34 +48,35 @@ Planned/in progress:
 
 ```text
 contracts/
-  Counter.sol           # Hardhat template contract
-  Counter.t.sol         # Example Solidity test from template
-  DataSharing.sol       # Core project contract: off-chain data sharing logic
-  DataSharing.t.sol     # Solidity unit tests for DataSharing
-
-ignition/
-  modules/
-    Counter.ts          # Example Ignition deployment module (template)
+  ConsentManager.sol
+  DataSharing.sol
+  IdentityRegistry.sol
+  RewardToken.sol
 
 scripts/
-  send-op-tx.ts         # Example script from Hardhat template
+  deploy.py          # deploy to local Hardhat, save addresses
+  testConsent.py     # example interaction with ConsentManager
+  send-op-tx.ts      # OP chain demo (optional)
 
 test/
-  Counter.ts            # Node/TypeScript test for Counter
+  ConsentManager.t.sol
+  DataSharing.t.sol
+  IdentityRegistry.t.sol
+  RewardToken.t.sol
+  SystemWorkflow.t.sol
 
-hardhat.config.ts       # Hardhat configuration (ESM)
+hardhat.config.ts
 package.json
 tsconfig.json
 ```
 
 ## Running the project
 
-```terminal
-npx install
+```bash
+npm install
 npx hardhat compile
 npx hardhat node
 
-python .\scripts\deploy.py
-
-npx hardhat test
+python ./scripts/deploy.py
+python ./scripts/testConsent.py
 ```
