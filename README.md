@@ -9,7 +9,7 @@ The platform is built as part of the *Decentralized Digital Identity and Data Sh
 - Immutable audit logs of **all** data access attempts
 - Off-chain storage for sensitive medical records (only hashes + references on-chain)
 
-> ⚠️ **Important:** This repository is for academic use only.  
+> **Important:** This repository is for academic use only.  
 > Never use real patient data when testing or demonstrating the system.
 
 ---
@@ -73,3 +73,16 @@ test/
 hardhat.config.ts       # Hardhat configuration (ESM)
 package.json
 tsconfig.json
+```
+
+## Running the project
+
+```terminal
+npx install
+npx hardhat compile
+npx hardhat node
+
+python .\scripts\deploy.py
+
+npx hardhat test
+```

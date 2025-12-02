@@ -36,7 +36,7 @@ contract SystemWorkflowTest is Test {
         vm.prank(admin);
         consent = new ConsentManager();
 
-        // Wire reward ↔ consent
+        // Wire reward <-> consent
         vm.prank(admin);
         reward.setConsentManager(address(consent));
 
@@ -48,8 +48,8 @@ contract SystemWorkflowTest is Test {
         dataSharing = new DataSharing(address(consent));
     }
 
-    /// @notice Full workflow with manual revoke.
-    ///         register identity → register data → grant consent → access → revoke → access denied
+    // Full workflow with manual revoke.
+    //         register identity -> register data -> grant consent -> access -> revoke -> access denied
     function test_fullWorkflow_manualRevoke() public {
         uint256 dataTypeId = 1;
         bytes32 recordHash = keccak256(abi.encodePacked("integration-record"));
@@ -100,8 +100,8 @@ contract SystemWorkflowTest is Test {
         dataSharing.accessData(patient, dataTypeId);
     }
 
-    /// @notice Full workflow where consent expires automatically (no manual revoke).
-    ///         register identity → register data → grant consent (short) → access OK → time passes → access denied
+    // Full workflow where consent expires automatically (no manual revoke).
+    //         register identity -> register data -> grant consent (short) -> access OK -> time passes -> access denied
     function test_fullWorkflow_withExpiry() public {
         uint256 dataTypeId = 2;
         bytes32 recordHash = keccak256(abi.encodePacked("expiring-record"));
@@ -147,8 +147,8 @@ contract SystemWorkflowTest is Test {
 
     }
 
-    /// @notice Test scenario where requester attempts access without patient consent.
-    ///         register identity → register data → access denied (no consent granted)
+    // Test scenario where requester attempts access without patient consent.
+    //         register identity → register data → access denied (no consent granted)
     function test_accessDenied_noConsent() public {
         uint256 dataTypeId = 3;
         bytes32 recordHash = keccak256(abi.encodePacked("no-consent-record"));
