@@ -46,7 +46,6 @@ def get_instance(w3: Web3, contract_name: str, address: str, file_name: str | No
     return w3.eth.contract(address=address, abi=abi)
 
 
-# ---------- Main deployment ----------
 
 def main():
     w3 = Web3(Web3.HTTPProvider(HARDHAT_RPC_URL))
