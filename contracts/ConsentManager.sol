@@ -22,7 +22,7 @@ contract ConsentManager {
         uint64 createdAt; // When was this consent granted
         uint64 expiresAt; // When it expires (0 = doesn't expire)
         ConsentStatus status; 
-        string purpose; // Optional description, mostly for UI
+        string purpose; // for UI (not implemented)
     }
 
     // reward token wiring
