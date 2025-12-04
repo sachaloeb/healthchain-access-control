@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 //Registers users and their roles and stores hashed attributes.
 contract IdentityRegistry {
