@@ -80,7 +80,7 @@ def main():
     # 5) Deploy DataSharing with ConsentManager address
     data_sharing_addr = deploy_contract(w3, "DataSharing", ctor_args=(consent_addr,))
 
-    data_sharing = get_instance(w3, "DataSharing", data_sharing_addr)
+    # data_sharing = get_instance(w3, "DataSharing", data_sharing_addr)
 
     # ---------- Save addresses ----------
 

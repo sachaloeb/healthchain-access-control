@@ -32,7 +32,7 @@ lab_data_id = w3.keccak(text="blood_test")
 print("\nNow granting consent...") # Note: Do we say clinicians in general or 
                                 #IdentityRegistry gives the type of data requester (doctor, researcher, insurance provider)?
 
-# Allow access for 300s (5 mminutes)
+# Patient allows access for 300s (5 minutes)
 expiry_time = int(time.time()) + 300
 consent_reason = "diagnosis"
 grant_txn = consent_mgr.functions.grantConsent(

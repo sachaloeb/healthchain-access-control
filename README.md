@@ -77,6 +77,8 @@ npm install
 npx hardhat compile
 npx hardhat node
 
+npx hardhat test
+
 python ./scripts/deploy.py
 python ./scripts/testConsent.py
 ```
